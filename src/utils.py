@@ -1,3 +1,5 @@
+import re
+
 from textnode import TextNode, TextType
 from htmlnode import LeafNode
 
@@ -20,7 +22,7 @@ def text_node_to_html_node(text_node: TextNode):
             raise ValueError(f"invalid text type: {text_node.text_type}")
         
 
-def split_nodes_delimiter(old_nodes: [TextNode], delimiter, text_type):
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != TextType.TEXT:
@@ -35,3 +37,11 @@ def split_nodes_delimiter(old_nodes: [TextNode], delimiter, text_type):
             TextNode(node_parts[2], TextType.TEXT)
         ])
     return new_nodes
+
+
+def extract_markdown_images(text):
+    return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+
+def extract_markdown_links(text):
+    return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)

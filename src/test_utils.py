@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from utils import text_node_to_html_node, split_nodes_delimiter
+from utils import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 
 class TestTextNodeToHTMLNode(unittest.TestCase):    
     def test_text(self):
@@ -109,5 +109,49 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             split_nodes_delimiter([node], "**", TextType.BOLD)
 
 
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_multiple_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        )
+        self.assertListEqual([("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")], matches)
+
+    
+    def test_invalid_markdown_image_format(self):
+        matches = extract_markdown_images(
+            "Bad ![image(link.com/here.png)"
+        )
+        self.assertListEqual([], matches)
+
+
+class TextExtractMarkdownLinks(unittest.TestCase):
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text with a [link](https://www.google.com)"
+        )
+        self.assertListEqual([("link", "https://www.google.com")], matches)
+
+    
+    def test_multiple_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        )
+        self.assertListEqual([("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")], matches)
+
+
+    def test_invalid_markdown_link_format(self):
+        matches = extract_markdown_links(
+            "Bad [link]www.bob.com)"
+        )
+        self.assertListEqual([], matches)
+
+
 if __name__ == "__main__":
     unittest.main()
+    
