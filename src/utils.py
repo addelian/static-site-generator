@@ -45,3 +45,39 @@ def extract_markdown_images(text):
 
 def extract_markdown_links(text):
     return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+
+def parse_node(node: TextNode, extract_func, text_type: TextType, ep):
+    nodes = []
+    extracted_params = extract_func(node.text)
+    if extracted_params == []:
+        nodes.append(node)
+        return nodes
+    text_to_split = node.text
+    for i in range(len(extracted_params)):
+        text, url = extracted_params[i]
+        sections = text_to_split.split(f"{ep}[{text}]({url})")
+        if sections[0] != "":
+            text_node = TextNode(sections[0], TextType.TEXT)
+            nodes.append(text_node)
+        nodes.append(TextNode(text, text_type, url))
+        if i < len(extracted_params) - 1:
+            text_to_split = sections[1]
+        else: 
+            if sections[1] != "":
+                text_node = TextNode(sections[1], TextType.TEXT)
+                nodes.append(text_node)
+    return nodes
+
+def split_nodes_image(old_nodes: list[TextNode]):
+    new_nodes = []
+    for node in old_nodes:
+        new_nodes.extend(parse_node(node, extract_markdown_images, TextType.IMAGE, '!'))
+    return new_nodes
+
+
+def split_nodes_link(old_nodes: list[TextNode]):
+    new_nodes = []
+    for node in old_nodes:
+        new_nodes.extend(parse_node(node, extract_markdown_links, TextType.LINK, ''))
+    return new_nodes
