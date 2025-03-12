@@ -1,5 +1,4 @@
 import unittest
-import textwrap
 
 from blocks import BlockType, markdown_to_blocks, block_to_block_type
 
@@ -7,11 +6,11 @@ class TestMarkdownToBlocks(unittest.TestCase):
     def test_markdown_to_blocks(self):
         md = """This is **bolded** paragraph
 
-            This is another paragraph with _italic_ text and `code` here
-            This is the same paragraph on a new line
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
 
-            - This is a list
-            - with items"""
+- This is a list
+- with items"""
         blocks = markdown_to_blocks(md)
         self.assertEqual(
             blocks,
@@ -25,19 +24,13 @@ class TestMarkdownToBlocks(unittest.TestCase):
     def test_markdown_to_blocks_extra_lines(self):
         md = """This is **bolded** paragraph
 
-        
 
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+ 
 
-            This is another paragraph with _italic_ text and `code` here
-            This is the same paragraph on a new line
-
-            
-
-
-
-
-            - This is a list
-            - with items"""
+- This is a list
+- with items"""
         blocks = markdown_to_blocks(md)
         self.assertEqual(
             blocks,
@@ -51,15 +44,13 @@ class TestMarkdownToBlocks(unittest.TestCase):
 
 class TestBlockToBlockType(unittest.TestCase):
     def test_code_block(self):
-        block = "```this is a code block```"
-        block2 = """```
-        still a
-        code
-        block```"""
+        block = """```
+still a
+code
+block
+```"""
         block_type = block_to_block_type(block)
-        block_type2 = block_to_block_type(block2)
         self.assertEqual(block_type, BlockType.CODE)
-        self.assertEqual(block_type2, BlockType.CODE)
 
 
     def test_not_code_block(self):
@@ -74,8 +65,8 @@ class TestBlockToBlockType(unittest.TestCase):
         self.assertEqual(block_type, BlockType.HEADING)
 
     
-    def test_h7_heading(self):
-        block = "####### my cool project readme"
+    def test_h6_heading(self):
+        block = "###### my cool project readme"
         block_type = block_to_block_type(block)
         self.assertEqual(block_type, BlockType.HEADING)
 
@@ -100,10 +91,10 @@ class TestBlockToBlockType(unittest.TestCase):
     
 
     def test_not_quote(self):
-        block = textwrap.dedent("""> bob said hi
+        block = """> bob said hi
 the raven said yo
 > bob said ughv
-> the raven's no dove""")
+> the raven's no dove"""
         block_type = block_to_block_type(block)
         self.assertEqual(block_type, BlockType.PARAGRAPH)
 

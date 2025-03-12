@@ -1,8 +1,7 @@
-from textnode import TextType, TextNode
+from file_utils import copy_files
 
 def main():
-    dummy = TextNode("New text node!", TextType.BOLD, "https://boot.dev")
-    print(dummy)
+    copy_files("static", "public")
 
 if __name__ == "__main__":
     main()
