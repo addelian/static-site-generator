@@ -1,15 +1,17 @@
 import os, shutil
 
-def copy_files(src, dst):
-    delete_folder_contents(dst)
-    for item in os.listdir(src):
-        src_path = os.path.join(src, item)
-        if os.path.isfile(src_path):
-            shutil.copy(src_path, dst)
-        elif os.path.isdir(src_path):
-            dst_path = f"{dst}/{item}"
-            os.mkdir(dst_path)
-            copy_files(src_path, dst_path)
+def copy_files_recursive(source_dir_path, dest_dir_path):
+    if not os.path.exists(dest_dir_path):
+        os.mkdir(dest_dir_path)
+
+    for filename in os.listdir(source_dir_path):
+        from_path = os.path.join(source_dir_path, filename)
+        dest_path = os.path.join(dest_dir_path, filename)
+        print(f" * {from_path} -> {dest_path}")
+        if os.path.isfile(from_path):
+            shutil.copy(from_path, dest_path)
+        else:
+            copy_files_recursive(from_path, dest_path)
 
 
 def delete_folder_contents(folder_path):
