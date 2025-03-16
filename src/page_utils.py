@@ -10,7 +10,7 @@ def extract_title(markdown):
     return header[0][2:].strip()
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     f = open(from_path)
     markdown = f.read()
@@ -20,17 +20,22 @@ def generate_page(from_path, template_path, dest_path):
     t.close()
     title = extract_title(markdown)
     html = markdown_to_html_node(markdown).to_html()
-    content = template.replace("{{ Title }}", title).replace("{{ Content }}", html)
+    content = (template
+               .replace("{{ Title }}", title)
+               .replace("{{ Content }}", html)
+               .replace('href="/', f'href="{basepath}')
+               .replace('src="/', f'src="{basepath}')
+               )
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     with open(dest_path, "w") as f:
         f.write(content)
     f.close()
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     if os.path.isfile(dir_path_content):
         html_file = dest_dir_path.replace("md", "html")
-        generate_page(dir_path_content, template_path, html_file)
+        generate_page(dir_path_content, template_path, html_file, basepath)
     else:
         for item in os.listdir(dir_path_content):
             current_level_path = f"{dir_path_content}/{item}"
@@ -38,7 +43,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             print('item', item, 'at', current_level_path, 'going to', current_level_dest)
             if os.path.isfile(item):
                 html_file = current_level_dest.replace("md", "html")
-                generate_page(current_level_path, template_path, html_file)
+                generate_page(current_level_path, template_path, html_file, basepath)
             else:
-                generate_pages_recursive(current_level_path, template_path, current_level_dest)
+                generate_pages_recursive(current_level_path, template_path, current_level_dest, basepath)
     

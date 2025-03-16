@@ -1,9 +1,12 @@
+import sys
+
 from file_utils import copy_files_recursive
-from page_utils import generate_page, generate_pages_recursive
+from page_utils import generate_pages_recursive
 
 def main():
-    copy_files_recursive("static", "public")
-    generate_pages_recursive("content", "template.html", "public")
+    basepath = "/" if len(sys.argv) < 2 else sys.argv[1]
+    copy_files_recursive("static", "docs")
+    generate_pages_recursive("content", "template.html", "docs", basepath)
 
 
 if __name__ == "__main__":
