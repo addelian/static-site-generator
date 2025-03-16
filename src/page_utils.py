@@ -28,20 +28,17 @@ def generate_page(from_path, template_path, dest_path):
 
 
 def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
-    # TODO is no good yet
-    # crawl every entry in content dir
     if os.path.isfile(dir_path_content):
-        generate_page(dir_path_content, template_path, dest_dir_path)
+        html_file = dest_dir_path.replace("md", "html")
+        generate_page(dir_path_content, template_path, html_file)
     else:
         for item in os.listdir(dir_path_content):
             current_level_path = f"{dir_path_content}/{item}"
             current_level_dest = f"{dest_dir_path}/{item}"
             print('item', item, 'at', current_level_path, 'going to', current_level_dest)
             if os.path.isfile(item):
-                generate_page(current_level_path, template_path, current_level_dest)
+                html_file = current_level_dest.replace("md", "html")
+                generate_page(current_level_path, template_path, html_file)
             else:
                 generate_pages_recursive(current_level_path, template_path, current_level_dest)
-            return
-    # for each md file found, generate .html using template.html
-    # write each gen. page to public directory using same structure
     
